@@ -90,3 +90,10 @@ if st.session_state.history:
         file_name="churn_predictions.csv",
         mime="text/csv"
     )
+
+# Chart: Churn vs Stay summary
+if not history_df.empty:
+    st.subheader("📊 Churn Prediction Summary")
+    chart_data = history_df["Prediction"].value_counts().rename_axis("Outcome").reset_index(name="Count")
+    st.bar_chart(chart_data.set_index("Outcome"))
+
