@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import numpy as np
+import pandas as pd
 
 # Load trained model
 model = pickle.load(open("xgboost_churn_model.pkl", "rb"))
@@ -46,22 +47,11 @@ input_data = np.array([[
     salary
 ]])
 
-# Predict
-if st.button("🔎 Predict Churn"):
-    prediction = model.predict(input_data)
-    st.subheader("📊 Prediction Result:")
-    if prediction[0] == 1:
-        st.error("⚠️ This customer is likely to churn.")
-    else:
-        st.success("✅ This customer is likely to stay.")
-
-import pandas as pd
-
 # Initialize session state to store predictions
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Prediction + Save button logic
+# Predict + Save
 if st.button("🔎 Predict Churn"):
     prediction = model.predict(input_data)
     st.subheader("📊 Prediction Result:")
@@ -87,7 +77,7 @@ if st.button("🔎 Predict Churn"):
     }
     st.session_state.history.append(result)
 
-# Display history table and download
+# Show prediction history and download option
 if st.session_state.history:
     st.subheader("📝 Prediction History")
     history_df = pd.DataFrame(st.session_state.history)
@@ -95,7 +85,7 @@ if st.session_state.history:
 
     csv = history_df.to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="⬇️ Download as CSV",
+        label="⬇️ Download Results as CSV",
         data=csv,
         file_name="churn_predictions.csv",
         mime="text/csv"
