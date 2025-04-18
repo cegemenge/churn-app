@@ -54,3 +54,43 @@ if st.button("🔎 Predict Churn"):
         st.error("⚠️ This customer is likely to churn.")
     else:
         st.success("✅ This customer is likely to stay.")
+
+import pandas as pd
+
+# Initialize session state for saving predictions
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# Store current prediction
+if st.button("💾 Save this result"):
+    result = {
+        "Credit Score": credit_score,
+        "Geography": geography,
+        "Gender": gender,
+        "Age": age,
+        "Tenure": tenure,
+        "Balance": balance,
+        "Products": products,
+        "Has Card": has_card,
+        "Is Active": is_active,
+        "Salary": salary,
+        "Prediction": "Churn" if prediction[0] == 1 else "Stay"
+    }
+    st.session_state.history.append(result)
+    st.success("Result saved!")
+
+# Show history table
+if st.session_state.history:
+    st.subheader("📝 Prediction History")
+    history_df = pd.DataFrame(st.session_state.history)
+    st.dataframe(history_df)
+
+    # Download button
+    csv = history_df.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="⬇️ Download as CSV",
+        data=csv,
+        file_name="churn_predictions.csv",
+        mime="text/csv"
+    )
+
