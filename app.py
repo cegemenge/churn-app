@@ -57,12 +57,21 @@ if st.button("🔎 Predict Churn"):
 
 import pandas as pd
 
-# Initialize session state for saving predictions
+# Initialize session state to store predictions
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Store current prediction
-if st.button("💾 Save this result"):
+# Prediction + Save button logic
+if st.button("🔎 Predict Churn"):
+    prediction = model.predict(input_data)
+    st.subheader("📊 Prediction Result:")
+    
+    if prediction[0] == 1:
+        st.error("⚠️ This customer is likely to churn.")
+    else:
+        st.success("✅ This customer is likely to stay.")
+
+    # Save result into history
     result = {
         "Credit Score": credit_score,
         "Geography": geography,
@@ -77,15 +86,13 @@ if st.button("💾 Save this result"):
         "Prediction": "Churn" if prediction[0] == 1 else "Stay"
     }
     st.session_state.history.append(result)
-    st.success("Result saved!")
 
-# Show history table
+# Display history table and download
 if st.session_state.history:
     st.subheader("📝 Prediction History")
     history_df = pd.DataFrame(st.session_state.history)
     st.dataframe(history_df)
 
-    # Download button
     csv = history_df.to_csv(index=False).encode("utf-8")
     st.download_button(
         label="⬇️ Download as CSV",
@@ -93,4 +100,3 @@ if st.session_state.history:
         file_name="churn_predictions.csv",
         mime="text/csv"
     )
-
